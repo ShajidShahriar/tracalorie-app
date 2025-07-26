@@ -9,6 +9,7 @@ this._displayCalorieLimit()
 this._displayCaloriesConsumed()
 this._displayCaloriesBurned()
 this._displayCaloriesRemaining()
+this._displayCaloriesProgress()
 
 }
 //public methods 
@@ -45,14 +46,35 @@ _displayCaloriesBurned(){
 }
 _displayCaloriesRemaining(){
     const caloriesRemainingEl = document.getElementById('calories-remaining')
+    const progressEl = document.getElementById('calorie-progress')
     const remaining = ( this._calorieLimit - this._totalCalories )
+    if (remaining <= 0) {
+        caloriesRemainingEl.parentElement.parentElement.classList.remove('bg-light')
+        caloriesRemainingEl.parentElement.parentElement.classList.add('bg-danger')
+        progressEl.classList.remove('bg-success')
+        progressEl.classList.add('bg-danger')
+    }
+    else{
+        caloriesRemainingEl.parentElement.parentElement.classList.remove('bg-danger')
+        caloriesRemainingEl.parentElement.parentElement.classList.add('bg-light')
+        progressEl.classList.remove('bg-danger')
+        progressEl.classList.add('bg-success')
+    }
     caloriesRemainingEl.innerHTML = remaining
+}
+_displayCaloriesProgress(){
+    const progressEl = document.getElementById('calorie-progress')
+    const percentage = (this._totalCalories / this._calorieLimit) * 100
+    const width = Math.min(percentage , 100)
+    progressEl.style.width = `${width}%`
+
 }
 _render(){
     this._displayCaloriesTotal()
     this._displayCaloriesConsumed()
     this._displayCaloriesBurned()
     this._displayCaloriesRemaining()
+    this._displayCaloriesProgress()
     
 }
 
@@ -73,16 +95,52 @@ class Workout{
     }
 }
 
-const tracker = new Calorietracker()
+class App{
+    constructor(){
+        this._tracker = new Calorietracker()
+        document.getElementById('meal-form').addEventListener('submit',this._newMeal.bind(this))
+        document.getElementById('workout-form').addEventListener('submit',this._newWorkout.bind(this))
+    }
+    _newMeal(e){
+        e.preventDefault()
+        const name = document.getElementById('meal-name')
+        const calories = document.getElementById('meal-calories')
+        // validate form 
+        if( name.value === '' || calories.value === '' ){
+                alert("please fill in all fields")
+                return 
+        }
 
-const breakfast = new Meal('morning-meal',200)
-tracker.addMeal(breakfast)
-const lunch =new Meal('lunch',350)
-tracker.addMeal(lunch)
-const workout = new Workout('running',400)
-tracker.addWokrout(workout)
+        const meal = new Meal(name.value,+calories.value)
+        this._tracker.addMeal(meal)
+        name.value = ''
+        calories.value = ''
+        const collapseMeal = document.getElementById('collapse-meal')   // collapse the meal form
+        const bsCollapse = new bootstrap.Collapse(collapseMeal,{
+            toggle : true
+        })
+    }
+    _newWorkout(e){
+        e.preventDefault()
+        const name = document.getElementById('workout-name')
+        const calories = document.getElementById('workout-calories')
+        // validate form 
+        if( name.value === '' || calories.value === '' ){
+                alert("please fill in all fields")
+                return 
+        }
+
+        const workout = new Workout(name.value,+calories.value)
+        this._tracker.addWokrout(workout)
+        name.value = ''
+        calories.value = ''
+        const collapseWorkout = document.getElementById('collapse-workout')   // collapse the workout form
+        const bsCollapse = new bootstrap.Collapse(collapseWorkout,{
+            toggle : true
+        })
+
+    }
+}
 
 
-console.log(breakfast)
-console.log(workout)
-console.log(tracker)
+const app = new App()
