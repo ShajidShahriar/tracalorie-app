@@ -98,48 +98,34 @@ class Workout{
 class App{
     constructor(){
         this._tracker = new Calorietracker()
-        document.getElementById('meal-form').addEventListener('submit',this._newMeal.bind(this))
-        document.getElementById('workout-form').addEventListener('submit',this._newWorkout.bind(this))
+        document.getElementById('meal-form').addEventListener('submit',this._newItem.bind(this,'meal'))
+        document.getElementById('workout-form').addEventListener('submit',this._newItem.bind(this,'workout'))
     }
-    _newMeal(e){
+    _newItem(type,e){
         e.preventDefault()
-        const name = document.getElementById('meal-name')
-        const calories = document.getElementById('meal-calories')
+        const name = document.getElementById(`${type}-name`)
+        const calories = document.getElementById(`${type}-calories`)
         // validate form 
         if( name.value === '' || calories.value === '' ){
                 alert("please fill in all fields")
                 return 
         }
-
-        const meal = new Meal(name.value,+calories.value)
-        this._tracker.addMeal(meal)
-        name.value = ''
-        calories.value = ''
-        const collapseMeal = document.getElementById('collapse-meal')   // collapse the meal form
-        const bsCollapse = new bootstrap.Collapse(collapseMeal,{
-            toggle : true
-        })
-    }
-    _newWorkout(e){
-        e.preventDefault()
-        const name = document.getElementById('workout-name')
-        const calories = document.getElementById('workout-calories')
-        // validate form 
-        if( name.value === '' || calories.value === '' ){
-                alert("please fill in all fields")
-                return 
+        if(type === 'meal'){
+            const meal = new Meal(name.value,+calories.value)
+            this._tracker.addMeal(meal)
         }
-
-        const workout = new Workout(name.value,+calories.value)
-        this._tracker.addWokrout(workout)
-        name.value = ''
-        calories.value = ''
-        const collapseWorkout = document.getElementById('collapse-workout')   // collapse the workout form
-        const bsCollapse = new bootstrap.Collapse(collapseWorkout,{
+        else{
+            const workout = new Workout(name.value,+calories.value)
+            this._tracker.addWokrout(workout)
+        }
+        const collapseItem = document.getElementById(`collapse-${type}`)   // collapse the  form
+        const bsCollapse = new bootstrap.Collapse(collapseItem,{
             toggle : true
-        })
+    })
+    name.value = ''
+    calories.value = ''
+}
 
-    }
 }
 
 
