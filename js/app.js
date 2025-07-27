@@ -44,11 +44,16 @@ class Calorietracker {
       this._render();
     }
   }
-  reset(){
-    this._totalCalories = 0
-    this._meals = []
-    this._workouts = []
-    this._render()
+  reset() {
+    this._totalCalories = 0;
+    this._meals = [];
+    this._workouts = [];
+    this._render();
+  }
+  setLimit(calorieLimit) {
+    this._calorieLimit = calorieLimit;
+    this._displayCalorieLimit();
+    this._render();
   }
   // private methods
 
@@ -195,12 +200,14 @@ class App {
     document
       .getElementById("filter-workouts")
       .addEventListener("keyup", this._filterItems.bind(this, "workout"));
-    
+
     document
       .getElementById("reset")
       .addEventListener("click", this._reset.bind(this));
-    
-    }
+    document
+      .getElementById("limit-form")
+      .addEventListener("submit", this._setDailyLimit.bind(this));
+  }
   _newItem(type, e) {
     e.preventDefault();
     const name = document.getElementById(`${type}-name`);
@@ -254,12 +261,26 @@ class App {
       }
     });
   }
-  _reset(){
-    this._tracker.reset()  //we will have to make this inside tracker
-    document.getElementById('meal-items').innerHTML = ''
-    document.getElementById('workout-items').innerHTML = ''
-    document.getElementById('filter-meals').value = ''
-    document.getElementById('filter-workouts').value = ''
+  _reset() {
+    this._tracker.reset(); //we will have to make this inside tracker
+    document.getElementById("meal-items").innerHTML = "";
+    document.getElementById("workout-items").innerHTML = "";
+    document.getElementById("filter-meals").value = "";
+    document.getElementById("filter-workouts").value = "";
+  }
+  _setDailyLimit(e) {
+    e.preventDefault();
+    const limit = document.getElementById("limit");
+    if (limit.value === "") {
+      alert("Please Set a Daily Calorie Limit");
+      return;
+    }
+    this._tracker.setLimit(+limit.value);
+    limit.value = "";
+
+    const modalEl = document.getElementById("limit-modal");
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    modal.hide();
   }
 }
 
